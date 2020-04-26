@@ -1,4 +1,4 @@
-FROM debian:buster-slim
+FROM ubuntu:18.04
 
 ENV STEAMCMDDIR /home/steam/steamcmd
 ENV STEAMAPPDIR /home/steam/tf2-dedicated
@@ -32,7 +32,7 @@ RUN { \
     echo 'app_update ${STEAMAPPID}'; \
     echo 'quit'; \
 } > ${STEAMAPPDIR}/tf2_update.txt
-
+WORKDIR ${STEAMAPPDIR}/tf
 RUN mkdir /root/.steam/sdk32
 RUN ln -s ${STEAMCMDDIR}/linux32/steamclient.so ~/.steam/sdk32/steamclient.so
 
@@ -44,13 +44,17 @@ RUN rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 RUN useradd steam
 USER steam
 WORKDIR $STEAMAPPDIR
-ENV SRCDS_PORT=27015 \
-    SRCDS_TV_PORT=27020 \
-    SRCDS_MAXPLAYERS=16 \
-    SRCDS_RCONPW="changeme" \
-    SRCDS_PW="" \
-    SRCDS_STARTMAP="ctf_2fort" \
-    SRCDS_CONFIG="server.cfg"
+ENV SRCDS_FPSMAX=300 \
+	SRCDS_TICKRATE=66 \
+	SRCDS_PORT=27015 \
+	SRCDS_TV_PORT=27020 \
+	SRCDS_MAXPLAYERS=16 \
+	SRCDS_TOKEN=0 \
+	SRCDS_RCONPW="changeme" \
+	SRCDS_PW="" \
+	SRCDS_STARTMAP="ctf_2fort" \
+	SRCDS_REGION=3 \
+	SRCDS_CONFIG="server.cfg"
 
 USER steam
 
@@ -59,12 +63,12 @@ WORKDIR $STEAMAPPDIR
 VOLUME $STEAMAPPDIR
 
 ENTRYPOINT ${STEAMCMDDIR}/steamcmd.sh \
-        +login anonymous +force_install_dir ${STEAMAPPDIR} +app_update ${STEAMAPPID} +quit \
+		+login anonymous +force_install_dir ${STEAMAPPDIR} +app_update ${STEAMAPPID} +quit \
         && ${STEAMAPPDIR}/srcds_run \
-        -game tf -steam_dir ${STEAMCMDDIR} -port $SRCDS_PORT -tv_port $SRCDS_TV_PORT \
-        -maxplayers $SRCDS_MAXPLAYERS +ip 0.0.0.0 +map $SRCDS_STARTMAP \
-        +rcon_password $SRCDS_RCONPW \
-        +sv_password $SRCDS_PW +servercfgfile $SRCDS_CONFIG -secured
+        -game tf -steam_dir ${STEAMCMDDIR} +fps_max $SRCDS_FPSMAX \
+        -tickrate $SRCDS_TICKRATE -port $SRCDS_PORT -tv_port $SRCDS_TV_PORT -maxplayers $SRCDS_MAXPLAYERS +ip 0.0.0.0\
+        +map $SRCDS_STARTMAP +sv_setsteamaccount $SRCDS_TOKEN +rcon_password $SRCDS_RCONPW +sv_password $SRCDS_PW +sv_region $SRCDS_REGION +servercfgfile $SRCDS_CONFIG -secured
+
 
 
 
