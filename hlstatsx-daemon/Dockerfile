@@ -16,7 +16,8 @@ RUN set -x \
     libdbd-mysql-perl \
     openssl \
     unzip \
-    cron
+    cron \
+    wget
 
     
 RUN set -x \
