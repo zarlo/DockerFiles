@@ -24,6 +24,12 @@ RUN set -x \
     && cpan GeoIP2::Database::Reader \
     && cpan Syntax::Keyword::Try 
 
+RUN set -x \
+    wget https://github.com/NomisCZ/hlstatsx-community-edition/archive/master.zip -o /tmp/hlstatsx.zip \
+    unzip /tmp/hlstatsx.zip \
+    mkdir ${HLSTATSX} \
+    mv /tmp/hlstatsx-community-edition-master/scripts/* ${HLSTATSX}
+
 RUN chmod +x ${HLSTATSX}hlstats-awards.pl ${HLSTATSX}hlstats.pl ${HLSTATSX}hlstats-resolve.pl ${HLSTATSX}run_hlstats ${HLSTATSX}GeoLiteCity/install_binary.sh
 
 COPY cron /etc/cron.d/hlstats-cron
