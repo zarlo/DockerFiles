@@ -30,6 +30,6 @@ RUN chmod 0644 /etc/cron.d/hlstats-cron
 RUN crontab /etc/cron.d/hlstats-cron
 
 RUN touch /var/log/cron.log
-CMD cron && ${HLSTATSX}GeoLiteCity/install_binary.sh && ${HLSTATSX}run_hlstats start && tail -f /var/log/cron.log
+CMD cron && /opt/hlstatsx/GeoLiteCity/install_binary.sh && /opt/hlstatsx/run_hlstats start && tail -f /var/log/cron.log
 
 EXPOSE 27500/tcp 27500/udp
