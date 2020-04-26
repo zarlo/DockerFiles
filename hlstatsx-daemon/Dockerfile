@@ -25,11 +25,10 @@ RUN set -x \
     && cpan Syntax::Keyword::Try 
 
 RUN set -x \
-    wget https://github.com/NomisCZ/hlstatsx-community-edition/archive/master.zip \
-    unzip master.zip \
+    wget https://github.com/NomisCZ/hlstatsx-community-edition/archive/master.zip -O /tmp/hlstatsx.zip \
+    unzip /tmp/hlstatsx.zip \
     mkdir ${HLSTATSX} \
-    mv ./hlstatsx-community-edition-master/scripts/* ${HLSTATSX} \
-    rm master.zip
+    mv /tmp/hlstatsx-community-edition-master/scripts/* ${HLSTATSX}
 
 RUN chmod +x ${HLSTATSX}hlstats-awards.pl ${HLSTATSX}hlstats.pl ${HLSTATSX}hlstats-resolve.pl ${HLSTATSX}run_hlstats ${HLSTATSX}GeoLiteCity/install_binary.sh
 
