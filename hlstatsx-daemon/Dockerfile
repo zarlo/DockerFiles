@@ -26,10 +26,13 @@ RUN set -x \
 
 COPY cron /etc/cron.d/hlstats-cron
 
+COPY start.sh ${HLSTATSX}
+
 RUN chmod 0644 /etc/cron.d/hlstats-cron
 RUN crontab /etc/cron.d/hlstats-cron
+RUN ln -sf /dev/stdout /var/log/cron.log
+WORKDIR ${HLSTATSX}
 
-RUN touch /var/log/cron.log
-CMD cron && /opt/hlstatsx/GeoLiteCity/install_binary.sh && /opt/hlstatsx/run_hlstats start && tail -f /var/log/cron.log
+CMD ["start.sh"]
 
 EXPOSE 27500/tcp 27500/udp
