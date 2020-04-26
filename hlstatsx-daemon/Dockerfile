@@ -24,22 +24,15 @@ RUN set -x \
     && cpan GeoIP2::Database::Reader \
     && cpan Syntax::Keyword::Try 
 
-RUN set -x \
-    wget https://github.com/NomisCZ/hlstatsx-community-edition/archive/master.zip -o /tmp/hlstatsx.zip \
-    unzip /tmp/hlstatsx.zip \
-    mkdir ${HLSTATSX} \
-    mv /tmp/hlstatsx-community-edition-master/scripts ${HLSTATSX}
-
-RUN chmod +x hlstats-awards.pl hlstats.pl hlstats-resolve.pl run_hlstats
+RUN chmod +x ${HLSTATSX}hlstats-awards.pl ${HLSTATSX}hlstats.pl ${HLSTATSX}hlstats-resolve.pl ${HLSTATSX}run_hlstats ${HLSTATSX}GeoLiteCity/install_binary.sh
 
 COPY cron /etc/cron.d/hlstats-cron
 
-COPY install_binary.sh ${HLSTATSX}GeoLiteCity/install_binary.sh
 
 RUN chmod 0644 /etc/cron.d/hlstats-cron
 RUN crontab /etc/cron.d/hlstats-cron
 
 RUN touch /var/log/cron.log
-CMD cron && ${HLSTATSX}run_hlstats start && tail -f /var/log/cron.log
+CMD cron && ${HLSTATSX}GeoLiteCity/install_binary.sh && ${HLSTATSX}run_hlstats start && tail -f /var/log/cron.log
 
 EXPOSE 27500/tcp 27500/udp
