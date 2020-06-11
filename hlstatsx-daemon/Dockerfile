@@ -31,9 +31,9 @@ COPY start.sh ${HLSTATSX}
 
 RUN chmod 0644 /etc/cron.d/hlstats-cron
 RUN crontab /etc/cron.d/hlstats-cron
-RUN ln -sf /dev/stdout /var/log/cron.log
+
 WORKDIR ${HLSTATSX}
 
-CMD ["start.sh"]
+ENTRYPOINT ["start.sh"]
 
 EXPOSE 27500/tcp 27500/udp

@@ -1,4 +1,3 @@
-0 0 * * * /opt/hlstatsx/hlstats-awards.pl >> /var/log/cron.log 2>&1
-*/30 * * * * /opt/hlstatsx/run_hlstats start >> /var/log/cron.log 2>&1
-0 0 * * * /opt/hlstatsx/run_hlstats restart >> /var/log/cron.log 2>&1
-0 0 * * * /opt/hlstatsx/hlstats-awards.pl >> /var/log/cron.log 2>&1
+*/30 * * * * /opt/hlstatsx/hlstats-awards.pl >> /dev/stdout 2>&1
+*/30 * * * * /opt/hlstatsx/run_hlstats start >> /dev/stdout 2>&1
+0 0 * * * /opt/hlstatsx/run_hlstats restart >> /dev/stdout 2>&1
