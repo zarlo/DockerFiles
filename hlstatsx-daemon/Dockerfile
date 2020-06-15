@@ -19,7 +19,6 @@ RUN set -x \
     cron \
     wget
 
-    
 RUN set -x \
     && cpan install MaxMind::DB::Reader \
     && cpan GeoIP2::Database::Reader \
@@ -29,8 +28,10 @@ COPY cron /etc/cron.d/hlstats-cron
 
 COPY start.sh ${HLSTATSX}
 
-RUN chmod 0644 /etc/cron.d/hlstats-cron
+RUN chmod +x /etc/cron.d/hlstats-cron
 RUN crontab /etc/cron.d/hlstats-cron
+RUN service cron reload
+RUN service cron restart
 
 WORKDIR ${HLSTATSX}
 
