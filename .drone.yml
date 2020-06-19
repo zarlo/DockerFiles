@@ -16,14 +16,14 @@ docker-volumes: &docker-volumes
 
 steps:
 - name: build
-  image: plugin/docker
+  image: docker
   environment: *environment
   volumes: *docker-volumes
   commands:
   - docker build -t $IMAGE_NAME:daemon -t $IMAGE_NAME:daemon-$IMAGE_VERSION ./hlstatsx-daemon
 
 - name: publish
-  image: plugin/docker
+  image: docker
   commands:
   - docker push $IMAGE_NAME:daemon-$IMAGE_VERSION
   - docker push $IMAGE_NAME:daemon
@@ -31,7 +31,7 @@ steps:
   environment: *environment
 
 - name: deploy-test
-  image: plugin/docker
+  image: docker
   commands:
   - docker service update --image=$IMAGE_NAME $SERVICE_NAME
   volumes: *docker-volumes
