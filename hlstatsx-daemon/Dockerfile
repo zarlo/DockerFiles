@@ -10,9 +10,11 @@ ENV GEOIP_AccountID="0" \
     DBPassword="" \
     DBName="" \
     EventQueueSize="10" \
-    DebugLevel="0"
+    DebugLevel="0" \
+    COUNT="5"
 
 VOLUME /opt/GeoIP2-Country/
+VOLUME /logs
 
 RUN set -x \
     && dpkg --add-architecture i386 \
@@ -29,35 +31,40 @@ RUN set -x \
     cron \
     wget \
     git \
-    cpm
+    cpanminus
 
 RUN apt-get install --reinstall ca-certificates
 
 RUN set -x \
-    && cpm install MaxMind::DB::Reader \
-    && cpm install GeoIP2::Database::Reader \
-    && cpm install Syntax::Keyword::Try 
+    && cpanm install MaxMind::DB::Reader \
+    && cpanm install GeoIP2::Database::Reader \
+    && cpanm install Syntax::Keyword::Try 
 
-COPY cron /etc/cron.d/hlstats-cron
-COPY entry.sh /entry.sh
+RUN git clone https://github.com/NomisCZ/hlstatsx-community-edition.git /tmp/hlstatsx \
+    && cp -r /tmp/hlstatsx/scripts ${HLSTATSX} \
+    && rm -r /tmp/*
 
-RUN chmod +x /etc/cron.d/hlstats-cron
-RUN crontab /etc/cron.d/hlstats-cron
-RUN service cron reload
-RUN service cron restart
 
-RUN git clone https://github.com/NomisCZ/hlstatsx-community-edition.git /tmp/hlstatsx
-RUN cp -r /tmp/hlstatsx/scripts ${HLSTATSX}
+RUN wget https://github.com/maxmind/geoipupdate/releases/download/v4.3.0/geoipupdate_4.3.0_linux_amd64.deb -O /tmp/geoipupdate.deb \
+    && dpkg -i /tmp/geoipupdate.deb \
+    && rm -r /tmp/*
 
 WORKDIR ${HLSTATSX}
 
+COPY cron /etc/cron.d/hlstats-cron
+RUN chmod +x /etc/cron.d/hlstats-cron
 
-RUN wget https://github.com/maxmind/geoipupdate/releases/download/v4.3.0/geoipupdate_4.3.0_linux_amd64.deb -O /tmp/geoipupdate.deb
-RUN dpkg -i /tmp/geoipupdate.deb
-COPY GeoIP.conf /etc/GeoIP.conf
 
-RUN ln -s /opt/GeoIP2-Country/ ${HLSTATSX}GeoLiteCity/
+RUN ln -s /opt/GeoIP2-Country/ ${HLSTATSX} \
+    && ln -s ${HLSTATSX}/logs /logs
 
-ENTRYPOINT ["/entry.sh"]
+COPY entry.sh ${HLSTATSX}entry.sh
+COPY geoipupdate.sh ${HLSTATSX}geoipupdate.sh
+COPY hlstats-awards.sh ${HLSTATSX}hlstats-awards.sh
+RUN chmod +x ${HLSTATSX}entry.sh ${HLSTATSX}run_hlstats ${HLSTATSX}hlstats-awards.pl ${HLSTATSX}geoipupdate.sh ${HLSTATSX}hlstats-awards.sh
+
+RUN service cron start
+
+ENTRYPOINT [ "${HLSTATSX}entry.sh"]
 
 EXPOSE 27500/udp
