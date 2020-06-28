@@ -57,9 +57,9 @@ COPY geoipupdate.sh ${HLSTATSX}geoipupdate.sh
 COPY hlstats-awards.sh ${HLSTATSX}hlstats-awards.sh
 RUN chmod +x ${HLSTATSX}entry.sh ${HLSTATSX}run_hlstats ${HLSTATSX}hlstats-awards.pl ${HLSTATSX}geoipupdate.sh ${HLSTATSX}hlstats-awards.sh
 
-RUN (crontab -l ; echo "* 0  * * *   /opt/hlstatsx/hlstats-awards.sh >> /dev/stdout 2>&1") 2>&1 | crontab -
-RUN (crontab -l ; echo "0 0  * * *   /opt/hlstatsx/run_hlstats restart >> /dev/stdout 2>&1") 2>&1 | crontab -
-RUN (crontab -l ; echo "5 22 * * *   /usr/bin/geoipupdate >> /dev/stdout 2>&1") 2>&1 | crontab -
+RUN (crontab -l ; echo "* 0  * * *   /opt/hlstatsx/hlstats-awards.sh >> /dev/stdout 2>&1") | crontab -
+RUN (crontab -l ; echo "0 0  * * *   /opt/hlstatsx/run_hlstats restart >> /dev/stdout 2>&1") | crontab -
+RUN (crontab -l ; echo "5 22 * * *   /usr/bin/geoipupdate >> /dev/stdout 2>&1") | crontab -
 
 RUN service cron reload \
     && service cron restart
