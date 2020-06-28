@@ -26,3 +26,32 @@ volumes:
   - name: docker
     host:
       path: /var/run/docker.sock
+
+---
+kind: pipeline
+type: docker
+name: GeoIP2
+
+clone:
+  depth: 1
+
+environment: &environment
+  IMAGE_NAME: zarlo5899/GeoIP2
+
+docker-volumes: &docker-volumes
+- name: docker
+  path: /var/run/docker.sock
+
+steps:
+- name: build
+  image: docker
+  environment: *environment
+  volumes: *docker-volumes
+  commands:
+  - docker build -t $IMAGE_NAME:latest ./GeoIP2
+
+volumes:
+  - name: docker
+    host:
+      path: /var/run/docker.sock
+

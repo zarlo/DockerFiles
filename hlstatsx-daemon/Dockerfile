@@ -2,7 +2,6 @@ FROM debian:buster-slim
 
 ENV HLSTATSX=/opt/hlstatsx/
 
-
 ENV GEOIP_AccountID="0" \
     GEOIP_LicenseKey="" \
     DBHost="" \
@@ -44,16 +43,11 @@ RUN git clone https://github.com/NomisCZ/hlstatsx-community-edition.git /tmp/hls
     && cp -r /tmp/hlstatsx/scripts ${HLSTATSX} \
     && rm -r /tmp/*
 
-
 RUN wget https://github.com/maxmind/geoipupdate/releases/download/v4.3.0/geoipupdate_4.3.0_linux_amd64.deb -O /tmp/geoipupdate.deb \
     && dpkg -i /tmp/geoipupdate.deb \
     && rm -r /tmp/*
 
 WORKDIR ${HLSTATSX}
-
-COPY cron /etc/cron.d/hlstats-cron
-RUN chmod +x /etc/cron.d/hlstats-cron
-
 
 RUN ln -s /opt/GeoIP2-Country/ ${HLSTATSX} \
     && ln -s ${HLSTATSX}/logs /logs
@@ -63,7 +57,13 @@ COPY geoipupdate.sh ${HLSTATSX}geoipupdate.sh
 COPY hlstats-awards.sh ${HLSTATSX}hlstats-awards.sh
 RUN chmod +x ${HLSTATSX}entry.sh ${HLSTATSX}run_hlstats ${HLSTATSX}hlstats-awards.pl ${HLSTATSX}geoipupdate.sh ${HLSTATSX}hlstats-awards.sh
 
-RUN service cron start
+RUN (crontab -l ; echo "* 0  * * *   /opt/hlstatsx/hlstats-awards.sh >> /dev/stdout 2>&1") 2>&1 | crontab -
+RUN (crontab -l ; echo "0 0  * * *   /opt/hlstatsx/run_hlstats restart >> /dev/stdout 2>&1") 2>&1 | crontab -
+RUN (crontab -l ; echo "5 22 * * *   /usr/bin/geoipupdate >> /dev/stdout 2>&1") 2>&1 | crontab -
+
+RUN service cron reload \
+    && service cron restart
+
 
 ENTRYPOINT [ "${HLSTATSX}entry.sh"]
 
